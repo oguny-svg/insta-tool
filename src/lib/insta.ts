@@ -72,3 +72,27 @@ export async function verifyInstagramCode(username: string, code: string) {
         throw error;
     }
 }
+
+export async function getAllFollowers(ig: IgApiClient, userId: string | number) {
+    const followersFeed = ig.feed.accountFollowers(userId);
+    let followers: any[] = [];
+
+    do {
+        const items = await followersFeed.items();
+        followers = followers.concat(items);
+    } while (followersFeed.isMoreAvailable());
+
+    return followers;
+}
+
+export async function getAllFollowing(ig: IgApiClient, userId: string | number) {
+    const followingFeed = ig.feed.accountFollowing(userId);
+    let following: any[] = [];
+
+    do {
+        const items = await followingFeed.items();
+        following = following.concat(items);
+    } while (followingFeed.isMoreAvailable());
+
+    return following;
+}
