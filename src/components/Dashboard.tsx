@@ -14,7 +14,7 @@ import {
     CheckSquare,
     Square
 } from 'lucide-react';
-import UserList from './UserList';
+import UserList from '@/components/UserList';
 
 interface DashboardProps {
     user: any;
