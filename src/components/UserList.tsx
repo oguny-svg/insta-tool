@@ -1,15 +1,23 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { UserMinus, UserPlus, ExternalLink } from 'lucide-react';
+import { UserMinus, UserPlus, ExternalLink, Check } from 'lucide-react';
 
 interface UserListProps {
     users: any[];
     activeTab: 'unfollowers' | 'fans' | 'mutuals';
+    selectedIds: Set<string>;
+    onSelectUser: (userId: string) => void;
     onAction: (userId: string, action: 'follow' | 'unfollow') => void;
 }
 
-export default function UserList({ users, activeTab, onAction }: UserListProps) {
+export default function UserList({
+    users,
+    activeTab,
+    selectedIds,
+    onSelectUser,
+    onAction
+}: UserListProps) {
     if (users.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center py-20 text-zinc-500">
@@ -29,9 +37,20 @@ export default function UserList({ users, activeTab, onAction }: UserListProps) 
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         transition={{ delay: index * 0.03 }}
-                        className="flex items-center justify-between px-6 py-4 transition-colors hover:bg-white/[0.02]"
+                        onClick={() => onSelectUser(user.pk.toString())}
+                        className={`flex items-center justify-between px-6 py-4 transition-all cursor-pointer ${selectedIds.has(user.pk.toString())
+                                ? 'bg-insta-pink/10 border-l-4 border-l-insta-pink'
+                                : 'hover:bg-white/[0.02] border-l-4 border-l-transparent'
+                            }`}
                     >
                         <div className="flex items-center gap-4">
+                            <div className={`flex h-6 w-6 items-center justify-center rounded-lg border-2 transition-all ${selectedIds.has(user.pk.toString())
+                                    ? 'bg-insta-pink border-insta-pink'
+                                    : 'border-zinc-700 bg-transparent'
+                                }`}>
+                                {selectedIds.has(user.pk.toString()) && <Check className="h-4 w-4 text-white" />}
+                            </div>
+
                             <div className="relative">
                                 <img
                                     src={user.profile_pic_url}
@@ -54,7 +73,7 @@ export default function UserList({ users, activeTab, onAction }: UserListProps) 
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
                             <a
                                 href={`https://instagram.com/${user.username}`}
                                 target="_blank"
