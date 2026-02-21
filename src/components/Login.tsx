@@ -75,6 +75,8 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                                     <User className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-500 group-focus-within:text-insta-pink transition-colors" />
                                     <input
                                         type="text"
+                                        name="username"
+                                        autoComplete="username"
                                         value={username}
                                         onChange={(e) => setUsername(e.target.value)}
                                         required
@@ -90,6 +92,8 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                                     <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-500 group-focus-within:text-insta-pink transition-colors" />
                                     <input
                                         type="password"
+                                        name="password"
+                                        autoComplete="current-password"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
