@@ -6,7 +6,6 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const { username, password, code } = body;
 
-        // Eğer kod gelmişse doğrulamaya git
         if (code && username) {
             const result = await verifyInstagramCode(username, code);
             return NextResponse.json({
@@ -21,7 +20,6 @@ export async function POST(req: NextRequest) {
             });
         }
 
-        // İlk giriş denemesi
         if (!username || !password) {
             return NextResponse.json({ error: 'Kullanıcı adı ve şifre gereklidir.' }, { status: 400 });
         }
@@ -51,13 +49,21 @@ export async function POST(req: NextRequest) {
     } catch (error: any) {
         console.error('Login API error:', error);
 
-        let errorMessage = 'Giriş yapılamadı. Lütfen bilgilerinizi kontrol edin.';
+        let errorMessage = 'Giriş yapılamadı.';
         const rawMessage = error.message || '';
+        const errorName = error.name || '';
 
-        if (rawMessage.includes('Bad Request') || rawMessage.includes('400')) {
-            errorMessage = 'Hatalı kullanıcı adı veya şifre veya Instagram erişimi reddetti.';
-        } else if (rawMessage.includes('code') || rawMessage.includes('verify')) {
-            errorMessage = 'Doğrulama kodu hatalı veya süresi dolmuş.';
+        // Instagram'dan gelen hataya göre spesifik mesajlar
+        if (errorName === 'IgLoginBadPasswordError') {
+            errorMessage = 'Girdiğiniz şifre hatalı. Lütfen tekrar kontrol edin.';
+        } else if (errorName === 'IgLoginInvalidUserError') {
+            errorMessage = 'Böyle bir kullanıcı adı bulunamadı.';
+        } else if (rawMessage.includes('block') || rawMessage.includes('spam')) {
+            errorMessage = 'Instagram bu girişi engelledi (Sunucu IP engeli). Lütfen bir süre sonra tekrar deneyin.';
+        } else if (rawMessage.includes('400')) {
+            errorMessage = 'Instagram erişimi reddetti. Şifrenizin doğruluğundan eminseniz, telefonunuzdan Giriş Hareketlerini onaylamanız gerekebilir.';
+        } else {
+            errorMessage = `Hata: ${rawMessage}`;
         }
 
         return NextResponse.json({
